@@ -1,32 +1,32 @@
+
+# .shift-schedule-mcp/node_modules/
+# IDE
+# MCP data (optional - users may want to persist)
+# OS
 # Python
-__pycache__/
+# Testing
+*.egg
+*.egg-info/
 *.pyc
-*.pyo
 *.pyd
+*.pyo
+*.swo
+*.swp
+.DS_Store
 .Python
+.coverage
+.env
+.env.*
+.idea/
+.pytest_cache/
+.tox/
+.venv
+.venv/
+.vscode/
+Thumbs.db
+__pycache__/
 build/
 dist/
-*.egg-info/
-*.egg
-venv/
-.env
-.venv
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Testing
-.pytest_cache/
-.coverage
+dist/*.tmp
 htmlcov/
-.tox/
-
-# MCP data (optional - users may want to persist)
-# .shift-schedule-mcp/
+venv/
