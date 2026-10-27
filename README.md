@@ -1,0 +1,107 @@
+# Shift Schedule MCP Server
+
+A Model Context Protocol (MCP) server for tracking work shifts, days off, and rotation patterns for healthcare workers. Designed for local-first, privacy-respecting schedule management that AI assistants can query over stdio.
+
+## Overview
+
+This server stores shift scheduling data in local JSON files and exposes a set of MCP tools that AI assistants can call to read, add, update, and delete records. It's intended as an **educational aid only** — it does not provide medical advice or replace professional scheduling software.
+
+## Features
+
+- **Shifts**: Store and retrieve work shifts with date, start/end times, department, and notes.
+- **Days Off**: Track days off by worker and date with optional reasons.
+- **Rotation Patterns**: Define recurring rotation cycles (e.g., 2 days on, 2 days off) with named patterns for teams.
+- **Local JSON Storage**: Data is stored as JSON files in `~/.shift-schedule-mcp/` by default.
+- **stdio MCP Transport**: Runs over standard I/O, making it easy to integrate with any MCP-compatible client.
+
+## Tools
+
+### Shifts
+| Tool | Description |
+|------|-------------|
+| `list_shifts` | List all shifts, optionally filtered by worker_id and/or date. |
+| `get_shift` | Retrieve a specific shift by ID. |
+| `add_shift` | Add a new shift. |
+| `update_shift` | Update an existing shift. |
+| `delete_shift` | Delete a shift by ID. |
+
+### Days Off
+| Tool | Description |
+|------|-------------|
+| `list_days_off` | List all days off, optionally filtered by worker_id and/or date. |
+| `get_day_off` | Retrieve a specific day off by ID. |
+| `add_day_off` | Add a new day off. |
+| `update_day_off` | Update an existing day off. |
+| `delete_day_off` | Delete a day off by ID. |
+
+### Rotation Patterns
+| Tool | Description |
+|------|-------------|
+| `list_rotations` | List all rotation patterns, optionally filtered by worker_id. |
+| `get_rotation` | Retrieve a specific rotation pattern by ID. |
+| `add_rotation` | Add a new rotation pattern. |
+| `update_rotation` | Update an existing rotation pattern. |
+| `delete_rotation` | Delete a rotation pattern by ID. |
+
+## Installation
+
+Requires Python 3.10+.
+
+```bash
+# Clone and enter the project directory
+git clone <repo-url>
+cd shift-schedule-mcp-server
+
+# Create a virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# Install the package and dev dependencies
+pip install -e ".[dev]"
+```
+
+## Running the Server
+
+The server runs as an MCP server over stdio. Once installed, add it to your MCP client configuration:
+
+```json
+{
+  "mcpServers": {
+    "shift-schedule": {
+      "command": "/path/to/venv/bin/python",
+      "args": ["-m", "shift_mcp"]
+    }
+  }
+}
+```
+
+### Data Location
+
+By default, data files are stored in `~/.shift-schedule-mcp/`. You can override this with the `SHIFT_SCHEDULE_DATA_DIR` environment variable:
+
+```bash
+SHIFT_SCHEDULE_DATA_DIR=/custom/path python -m shift_mcp
+```
+
+## Running Tests
+
+```bash
+# Inside the virtual environment
+pytest tests/ -v
+```
+
+## Storage Format
+
+Data is stored as JSON arrays in individual files:
+
+- `shifts.json` — Array of shift objects.
+- `days_off.json` — Array of day-off objects.
+- `rotations.json` — Array of rotation pattern objects.
+
+## License
+
+MIT License — see [LICENSE](LICENSE) for details.
+
+## Credits
+
+Developed by **Asdale Dynamics, LLC** (Indiana, formed October 2026).
