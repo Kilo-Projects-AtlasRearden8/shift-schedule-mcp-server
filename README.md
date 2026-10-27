@@ -1,68 +1,81 @@
 # Shift Schedule MCP Server
 
-A Model Context Protocol (MCP) server for tracking work shifts, days off, and rotation patterns for healthcare workers. Designed for local-first, privacy-respecting schedule management that AI assistants can query over stdio.
+A friendly, local-first MCP server for tracking work shifts, days off, and rotation patterns — built with healthcare workers in mind.
 
-## Overview
+## What is this?
 
-This server stores shift scheduling data in local JSON files and exposes a set of MCP tools that AI assistants can call to read, add, update, and delete records. It's intended as an **educational aid only** — it does not provide medical advice or replace professional scheduling software.
+This is an **MCP server**. MCP (Model Context Protocol) is a way for AI assistants to talk to tools and data on your computer. Think of it like a USB port for AI: it lets an AI assistant (like Claude or another model) safely read and update your shift schedule over a simple standard connection called **stdio**.
 
-## Features
+Instead of your schedule living in someone else's cloud, it stays on your machine in plain JSON files. You stay in control of your data.
 
-- **Shifts**: Store and retrieve work shifts with date, start/end times, department, and notes.
-- **Days Off**: Track days off by worker and date with optional reasons.
-- **Rotation Patterns**: Define recurring rotation cycles (e.g., 2 days on, 2 days off) with named patterns for teams.
-- **Local JSON Storage**: Data is stored as JSON files in `~/.shift-schedule-mcp/` by default.
-- **stdio MCP Transport**: Runs over standard I/O, making it easy to integrate with any MCP-compatible client.
+## Who this is for
 
-## Tools
+- **Healthcare workers** (nurses, aides, techs, and anyone on a rotating schedule) who want a simple, private way to track shifts and days off
+- **AI beginners** learning how MCP works — this server is small, tested, and easy to read
+- **Asdale Dynamics, LLC** projects and tools that need a practical, local-first scheduling example
 
-### Shifts
-| Tool | Description |
-|------|-------------|
-| `list_shifts` | List all shifts, optionally filtered by worker_id and/or date. |
-| `get_shift` | Retrieve a specific shift by ID. |
-| `add_shift` | Add a new shift. |
-| `update_shift` | Update an existing shift. |
-| `delete_shift` | Delete a shift by ID. |
+> **Important:** This tool is for organization and education only. It does not provide medical advice and is not a replacement for professional scheduling software.
 
-### Days Off
-| Tool | Description |
-|------|-------------|
-| `list_days_off` | List all days off, optionally filtered by worker_id and/or date. |
-| `get_day_off` | Retrieve a specific day off by ID. |
-| `add_day_off` | Add a new day off. |
-| `update_day_off` | Update an existing day off. |
-| `delete_day_off` | Delete a day off by ID. |
+## What it tracks
 
-### Rotation Patterns
-| Tool | Description |
-|------|-------------|
-| `list_rotations` | List all rotation patterns, optionally filtered by worker_id. |
-| `get_rotation` | Retrieve a specific rotation pattern by ID. |
-| `add_rotation` | Add a new rotation pattern. |
-| `update_rotation` | Update an existing rotation pattern. |
-| `delete_rotation` | Delete a rotation pattern by ID. |
+| Category | What you store |
+|----------|----------------|
+| **Shifts** | Worker, date, start/end times, department, notes |
+| **Days off** | Worker, date, optional reason |
+| **Rotation patterns** | Named rotation cycles (for example: 2 days on, 2 days off) with a list of workers |
 
-## Installation
+## The 15 tools an AI assistant can call
 
-Requires Python 3.10+.
+**Shifts**
+- `list_shifts` — List all shifts, optionally filter by worker and/or date
+- `get_shift` — Get one shift by its ID
+- `add_shift` — Add a new shift
+- `update_shift` — Change an existing shift
+- `delete_shift` — Remove a shift
+
+**Days off**
+- `list_days_off` — List all days off, optionally filter by worker and/or date
+- `get_day_off` — Get one day off by its ID
+- `add_day_off` — Add a new day off
+- `update_day_off` — Change an existing day off
+- `delete_day_off` — Remove a day off
+
+**Rotation patterns**
+- `list_rotations` — List rotation patterns, optionally filter by worker
+- `get_rotation` — Get one rotation by its ID
+- `add_rotation` — Add a rotation pattern
+- `update_rotation` — Change a rotation pattern
+- `delete_rotation` — Remove a rotation pattern
+
+## Where data lives
+
+By default, data is stored in three JSON files under `~/.shift-schedule-mcp/`:
+
+- `shifts.json`
+- `days_off.json`
+- `rotations.json`
+
+You can point it somewhere else with the `SHIFT_SCHEDULE_DATA_DIR` environment variable.
+
+## Install
+
+You need Python 3.10 or newer.
 
 ```bash
-# Clone and enter the project directory
-git clone <repo-url>
+# 1. Clone the project (or unzip it)
 cd shift-schedule-mcp-server
 
-# Create a virtual environment
+# 2. Create a virtual environment (keeps things tidy and local)
 python3 -m venv venv
 source venv/bin/activate
 
-# Install the package and dev dependencies
+# 3. Install the server and test tools
 pip install -e ".[dev]"
 ```
 
-## Running the Server
+## Run it
 
-The server runs as an MCP server over stdio. Once installed, add it to your MCP client configuration:
+The server speaks MCP over stdio, so you run it inside an MCP-compatible client. For example, add this to your MCP client config:
 
 ```json
 {
@@ -75,33 +88,35 @@ The server runs as an MCP server over stdio. Once installed, add it to your MCP 
 }
 ```
 
-### Data Location
+Once connected, an AI assistant can ask things like:
 
-By default, data files are stored in `~/.shift-schedule-mcp/`. You can override this with the `SHIFT_SCHEDULE_DATA_DIR` environment variable:
+> "What shifts does nurse-a have next week?"
+> "Add a day off for nurse-b on 2026-11-01 for personal time."
+> "List all rotation patterns for the ICU team."
+
+## Run the tests
+
+This project is tested. Run the test suite with:
 
 ```bash
-SHIFT_SCHEDULE_DATA_DIR=/custom/path python -m shift_mcp
-```
-
-## Running Tests
-
-```bash
-# Inside the virtual environment
+source venv/bin/activate
 pytest tests/ -v
 ```
 
-## Storage Format
+You should see **34 tests pass**: 28 that check the tool schemas are correct, and 6 that launch the real server and exercise it end-to-end (add, list, update, delete, date filtering, persistence).
 
-Data is stored as JSON arrays in individual files:
+## Local-first and private
 
-- `shifts.json` — Array of shift objects.
-- `days_off.json` — Array of day-off objects.
-- `rotations.json` — Array of rotation pattern objects.
+- Data stays on your machine in JSON files you can open in any text editor
+- No accounts, no cloud, no tracking
+- No secrets, API keys, or personal data are stored in the project files
 
 ## License
 
 MIT License — see [LICENSE](LICENSE) for details.
 
+Copyright (c) 2026 Asdale Dynamics, LLC
+
 ## Credits
 
-Developed by **Asdale Dynamics, LLC** (Indiana, formed October 2026).
+Created by **Asdale Dynamics, LLC** (Indiana, formed October 2026) — beginner-friendly AI education, books, and practical tools. Learn more at dylanasdale.github.io.
